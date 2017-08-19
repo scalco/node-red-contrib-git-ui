@@ -10,30 +10,11 @@ const successInitMessage = 'init written successfully'
 
 module.exports = {
   commit: (userDir, message) => new Promise((resolve, reject) => {
-    // deletes package.json
-    if (fs.existsSync(`${userDir}/package.json`)) {
-      fs.unlink(`${userDir}/package.json`, (err) => {
-        if (err && err.code !== fileDoesNotExist) {
-          reject(err)
-        }
-      })
-    }
-
-    // generates a new package.json based on node_modules in order to keep installed nodes
-    exec('npm init -y', { cwd: userDir }, (error, stdout, stderr) => {
-      if (error) {
-        reject(error)
-      } else if (stderr && !stderr.includes(successInitMessage)) {
-        reject(stderr)
+    git.add('--all').commit(message).push(remote, branch, (ex, data) => {
+      if (ex) {
+        reject(ex)
       } else {
-        // commits and pushes all changes to the remote branch
-        git.add('--all').commit(message).push(remote, branch, (ex, data) => {
-          if (ex) {
-            reject(ex)
-          } else {
-            resolve(data)
-          }
-        })
+        resolve(data)
       }
     })
   }),
