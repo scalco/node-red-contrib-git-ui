@@ -7,12 +7,12 @@ module.exports = (RED) => {
   }
   RED.nodes.registerType('git-ui', gitUiNode)
 
-  RED.httpAdmin.get('/git-ui/git-ui.html', (req, res) => {
+  RED.httpNode.get('/git-ui/git-ui.html', (req, res) => {
     const filename = path.join(__dirname, 'git-ui', 'git-ui.html')
     gitUi.sendFile(res, filename)
   })
 
-  RED.httpAdmin.post('/git-ui/commit', (req, res) => {
+  RED.httpNode.post('/git-ui/commit', (req, res) => {
     const userDir = RED.settings.userDir || RED.rocess.env.NODE_RED_HOME
     gitUi.commit(userDir, req.body.message).then((result) => {
       res.status(200).send({ status: 'OK', result })
@@ -21,12 +21,12 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/git-ui.css', (req, res) => {
+  RED.httpNode.get('/git-ui/git-ui.css', (req, res) => {
     const filename = path.join(__dirname, 'git-ui', 'git-ui.css')
     gitUi.sendFile(res, filename)
   })
 
-  RED.httpAdmin.get('/git-ui/logs/:branchName', (req, res) => {
+  RED.httpNode.get('/git-ui/logs/:branchName', (req, res) => {
     gitUi.logs(req.params.branchName).then((logList) => {
       res.status(200).send({ commits: logList.all })
     }).catch((err) => {
@@ -34,7 +34,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/branches', (req, res) => {
+  RED.httpNode.get('/git-ui/branches', (req, res) => {
     gitUi.branches().then((branchList) => {
       res.status(200).send({ branches: branchList.all, current: branchList.current })
     }).catch((err) => {
@@ -42,7 +42,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.put('/git-ui/checkout/:branchName', (req, res) => {
+  RED.httpNode.put('/git-ui/checkout/:branchName', (req, res) => {
     const userDir = RED.settings.userDir || RED.process.env.NODE_RED_HOME
     gitUi.cwd(userDir).then(() => {
       gitUi.checkout(req.params.branchName).then(() => {
@@ -55,7 +55,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/show/:hash/:fileName', (req, res) => {
+  RED.httpNode.get('/git-ui/show/:hash/:fileName', (req, res) => {
     gitUi.show(req.params.hash, req.params.fileName).then((object) => {
       res.status(200).send({ object })
     }).catch((err) => {
@@ -63,7 +63,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/show/:hash', (req, res) => {
+  RED.httpNode.get('/git-ui/show/:hash', (req, res) => {
     gitUi.show(req.params.hash, RED.settings.get('flowFile') || 'flows_' + require('os').hostname() + '.json').then((object) => {
       res.status(200).send({ object })
     }).catch((err) => {
@@ -71,7 +71,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/status', (req, res) => {
+  RED.httpNode.get('/git-ui/status', (req, res) => {
     gitUi.status().then((statusSummary) => {
       res.status(200).send({ statusSummary })
     }).catch((err) => {
@@ -79,7 +79,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/remote', (req, res) => {
+  RED.httpNode.get('/git-ui/remote', (req, res) => {
     gitUi.remoteGet().then((url) => {
       res.status(200).send({ url })
     }).catch((err) => {
@@ -87,7 +87,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.put('/git-ui/remote', (req, res) => {
+  RED.httpNode.put('/git-ui/remote', (req, res) => {
     gitUi.remoteSet(req.body.url).then((url) => {
       res.status(200).send({ url })
     }).catch((err) => {
@@ -95,7 +95,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/fetch', (req, res) => {
+  RED.httpNode.get('/git-ui/fetch', (req, res) => {
     gitUi.fetch().then(() => {
       res.status(204).send()
     }).catch((err) => {
@@ -103,7 +103,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.get('/git-ui/pull', (req, res) => {
+  RED.httpNode.get('/git-ui/pull', (req, res) => {
     gitUi.pull().then(() => {
       res.status(204).send()
     }).catch((err) => {
@@ -111,7 +111,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.put('/git-ui/update/:branchName', (req, res) => {
+  RED.httpNode.put('/git-ui/update/:branchName', (req, res) => {
     gitUi.update(req.params.branchName, req.query.force || false).then((url) => {
       res.status(200).send({ url })
     }).catch((err) => {
@@ -119,7 +119,7 @@ module.exports = (RED) => {
     })
   })
 
-  RED.httpAdmin.put('/git-ui/createLocalRepo', (req, res) => {
+  RED.httpNode.put('/git-ui/createLocalRepo', (req, res) => {
     const userDir = RED.settings.userDir || RED.rocess.env.NODE_RED_HOME
     gitUi.createLocalRepo(userDir).then((url) => {
       res.status(200).send({ status: 'OK' })
